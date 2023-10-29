@@ -1,0 +1,5 @@
+FROM jupyter/tensorflow-notebook:latest
+
+USER root
+
+RUN conda install plotly

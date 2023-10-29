@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  capstone:
+    build:
+      context: .
+      dockerfile: DockerFile
+    environment:
+      - JUPYTER_TOKEN=hi
+    ports:
+      - 8888:8888
+    container_name: capstone
