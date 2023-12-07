@@ -1,57 +1,25 @@
-aging_dementia_tbi
-==============================
+## SIADS Capstone Project - Dementia Biomarker Analysis and ML
 
-SIADS Capstone Project
+Project Team: The Neuromancers
 
-The Neuromancers
-------------
+### Project Statement
+Our goal with this project is to further the understanding of dementia by analyzing various biomarkers to derive insights about the various underlying diseases.  We attempt to build on previous studies examining the genetic factors associated with Dementia/Alzheimer’s Disease.
 
-    ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
-    │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+### Dataset: Aging, Dementia and Traumatic Brain Injury (TBI) Study
+The dataset we will be using for this project was developed by the Allen Institute for Brain Science in consortium with the University of Washington and Kaiser Permanente Washington Health Research Institute.  These organizations undertook a longitudinal cohort-based study known as the Adult Changes in Thought (ACT) study.  To enroll in the study, participants could not have an existing dementia diagnosis or reside in a nursing home.
+
+The data used in our analysis comes from a sample within this broader study.  This particular group of participants had either experienced at least one traumatic brain injury with loss of consciousness or were part of the similarity-matched control group.
 
 
---------
+### Work in Progress:
+- Data Processing
+- Exploratory Data Analysis
+- Gene Expression Analysis - Differential Expression
+- Gene Expression Analysis - Supervised Learning
+- Gene Expression Analysis - Unsupervised Learning
+- Protein Data Analysis - Supervised Learning
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+
+
+
