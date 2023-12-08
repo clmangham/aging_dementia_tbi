@@ -8,6 +8,8 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import train_test_split
+
 
 def get_counts():
 
@@ -75,11 +77,14 @@ def prep_data():
 
 def train_test_val_split(ml_df ,donor_ids, samples):
     # 70, 15, 15 Train, Validate, Test split
-    np.random.seed(42)
-    train_ids = np.random.choice(donor_ids, int(np.ceil(len(donor_ids) * 0.7)))
-    test_ids = np.setdiff1d(donor_ids, train_ids)
-    validate_ids = np.random.choice(test_ids, int(np.ceil(len(test_ids) * 0.5)))
-    test_ids = np.setdiff1d(test_ids, validate_ids)
+    # np.random.seed(42)
+    # train_ids = np.random.choice(donor_ids, int(np.ceil(len(donor_ids) * 0.7)))
+    # test_ids = np.setdiff1d(donor_ids, train_ids)
+    # validate_ids = np.random.choice(test_ids, int(np.ceil(len(test_ids) * 0.5)))
+    # test_ids = np.setdiff1d(test_ids, validate_ids)
+
+    train_ids, test_ids = train_test_split(donor_ids, test_size=0.33, random_state= 42)
+    train_ids, validate_ids = train_test_split(train_ids, test_size=0.33, random_state= 42)
 
     #samples (rna_profile_ids) by donor data splt
     train_samples = samples[samples['donor_id'].isin(train_ids)]['rnaseq_profile_id']
@@ -114,6 +119,39 @@ def train_test_val_split(ml_df ,donor_ids, samples):
     y_test = y_test.apply(lambda x: 1 if  x=='dementia' else 0)
 
     return X_train, y_train, X_val, y_val, X_test, y_test
+
+def custom_train_test_split(ml_df ,donor_ids, samples):
+    # 70, 30 Train, Test split
+    # np.random.seed(42)
+    train_ids, test_ids = train_test_split(donor_ids, test_size=0.33)
+    # print(len(train_ids), len(test_ids))
+
+    #samples (rna_profile_ids) by donor data splt
+    train_samples = samples[samples['donor_id'].isin(train_ids)]['rnaseq_profile_id']
+    test_samples = samples[samples['donor_id'].isin(test_ids)]['rnaseq_profile_id']
+
+    # Now can filter by train, val, test, split
+    train_df = ml_df[ml_df['rnaseq_profile_id'].isin(train_samples)].drop(columns = 'rnaseq_profile_id')
+    test_df = ml_df[ml_df['rnaseq_profile_id'].isin(test_samples)].drop(columns = 'rnaseq_profile_id')
+
+    # final data prep
+    X_train = train_df.drop(columns='Condition')
+    y_train = train_df['Condition']
+
+    X_test = test_df.drop(columns='Condition')
+    y_test = test_df['Condition']
+
+    # Scale data and transform data
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+
+    X_train = scaler.transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    y_train = y_train.apply(lambda x: 1 if x == 'dementia' else 0)
+    y_test = y_test.apply(lambda x: 1 if  x=='dementia' else 0)
+
+    return X_train, y_train, X_test, y_test
 
 
 def train_models(models, model_names, X_train, y_train, X_val, y_val):
