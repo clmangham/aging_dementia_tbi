@@ -12,6 +12,10 @@ import sklearn.metrics
 import kmedoids
 from sklearn.decomposition import PCA
 import plotly.express as px
+from matplotlib.pyplot import gcf
+import gseapy as gp
+from gseapy import barplot, dotplot
+import matplotlib.ticker as mtick
 
 
 # this function loads files and transforms them to output a count matrix and tpm matrix"
@@ -169,7 +173,7 @@ def lv_diff_exp(
     )
     lv_genes.to_pickle("..//data//interim//lv_genes.pkl")
 
-    return lv_genes_merged, lv_genes
+    return lv_genes_merged, lv_genes, lv_res
 
 
 # this creates mapping dictionaries to use for clustering
@@ -222,16 +226,54 @@ def hierarchical_clustering(deg_reads, exp_design):
     test = deg_reads.T.merge(exp_design, how="left", left_index=True, right_index=True)
     test = test.rename(columns={"act_demented": "Condition"})
     condition = test.pop("Condition")
+
     colors = dict(
-        zip(condition.unique(), "bc")
+        zip(
+            condition.unique(),
+            sns.color_palette(
+                "Spectral",
+                2,
+            ),
+        )
     )  # https://seaborn.pydata.org/generated/seaborn.clustermap.html
     row_colors = condition.map(colors)
+
     hier = sns.clustermap(
-        test, method="ward", z_score=1, cmap="mako", row_colors=row_colors
+        test,
+        method="ward",
+        cmap="Spectral",
+        row_colors=row_colors,
+        z_score=1,
+        metric="euclidean",
+        dendrogram_ratio=0.15,
+        figsize=(12, 10),
+        yticklabels=False,
+        cbar_pos=(0.03, 0.95, 0.2, 0.02),
+        cbar_kws={
+            "orientation": "horizontal"
+        },  # https://stackoverflow.com/questions/67040271/reduce-space-between-dendrogram-and-color-row-in-seaborn-clustermap
     )
+    for label in condition.unique():
+        hier.ax_row_dendrogram.bar(0, 0, color=colors[label], label=label, linewidth=0)
+    hier.ax_row_dendrogram.legend(
+        title="Condition",
+        loc="center",
+        bbox_transform=gcf().transFigure,
+        bbox_to_anchor=(0.95, 0.95),
+    )  # https://stackoverflow.com/questions/27988846/how-to-express-classes-on-the-axis-of-a-heatmap-in-seaborn
+    hier.ax_heatmap.set_xlabel("Genes")
+    hier.ax_col_dendrogram.set_title("Hierarchical Clustering - Gene Expression")
+    hier.cax.set_title("TPM Normalized", fontdict={"size": 8})
+    hier.cax.tick_params(labelsize=8)
+
+    l1 = hier.ax_heatmap.set_ylabel(
+        "Samples"
+    )  # https://stackoverflow.com/questions/46234158/how-to-remove-x-and-y-axis-labels-in-a-clustermap
     plt.show()
+    plt.figure(figsize=(6, 15))
     cls = ward(deg_reads.T)
-    den = dendrogram(cls)
+    den = dendrogram(cls, orientation="left", p=4, truncate_mode="level")
+    plt.title("Hierarchical Clustering - Gene Expression")
     plt.show()
 
 
@@ -247,13 +289,17 @@ def scale_deg_reads(deg_reads):
 # this performs k-means clustering
 def kmeans_clustering(x):
     lst = []
+    print("kmeans evaluation")
 
     for i in range(2, 20):
         kmeans = KMeans(
-            n_clusters=i, init="k-means++", max_iter=100, n_init=1, random_state=42
+            n_clusters=i,
+            init="k-means++",
+            max_iter=200,
+            n_init=1,
+            random_state=42,
         )
         c = kmeans.fit(x)
-        print("kmeans evaluation")
         print(
             "cluster {}: davies-bouldin: {} calinski harabasz: {} silhouette: {}".format(
                 i,
@@ -273,10 +319,10 @@ def kmeans_clustering(x):
     return labels_kmeans
 
 
-# this performs kmediods clustering
-def kmediods_clustering(x):
+# this performs kmedoids clustering
+def kmedoids_clustering(x):
     lst = []
-    print("kmediods evaluation")
+    print("kmedoids evaluation")
 
     for i in range(2, 20):
         km = kmedoids.KMedoids(i, method="fasterpam", metric="euclidean")
@@ -290,7 +336,7 @@ def kmediods_clustering(x):
             )
         )
         lst.append((c.inertia_))
-    print("kmediods evaluation")
+    print("kmedoids evaluation")
     plt.plot([x for x in range(2, 20)], lst)
     plt.xticks([x for x in range(2, 20)])
     plt.show()
@@ -309,18 +355,25 @@ def hdbscan_clustering(x):
 
 # this performs pca
 def pca_analysis(x):
-    pca = PCA()
+    pca = PCA(2)
     pca_res = pca.fit_transform(x)
     return pca_res
 
 
 # this graphs the pca and colors the samples based on cluster
-def cluster_pca_graphs(n_clusters, labels, pca_res):
+def cluster_pca_graphs(n_clusters, labels, pca_res, title):
     for i in range(n_clusters):
+        if i == 1:
+            x = "dodgerblue"
+        else:
+            x = "yellowgreen"
         plt.scatter(
-            pca_res[labels == i, 0], pca_res[labels == i, 1], label=i
+            pca_res[labels == i, 0], pca_res[labels == i, 1], label=i, c=x
         )  # https://medium.com/analytics-vidhya/implementation-of-principal-component-analysis-pca-in-k-means-clustering-b4bc0aa79cb6
     plt.legend()
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.title(title)
     plt.show()
 
 
@@ -378,12 +431,196 @@ def cluster_demo_graphs(
         for y in ["labels_kmed", "labels_kmeans", "labels_db"]:
 
             gb = clusters_df.groupby(by=[i, y]).count().reset_index()
-            fig = px.bar(gb, x=y, y="SST", color=i)
+            fig = px.bar(
+                gb, x=y, y="SST", color=i, title="{} Comparison for Clusters".format(i)
+            )
             fig.show()
 
     for i in ["braak", "nia_reagan"]:
         for y in ["labels_kmed", "labels_kmeans", "labels_db"]:
 
             gb = clusters_df.groupby(by=[y])[i].mean().reset_index()
-            fig = px.bar(gb, x=y, y=i)
+            fig = px.bar(gb, x=y, y=i, title="{} Comparison for Clusters".format(i))
             fig.show()
+    return clustering, clusters_df
+
+
+# this function creates the volcano plot for limma-voom results
+def lv_volc_plot(lv_res):
+    # Camaron's code inspired by Hemtools - https://hemtools.readthedocs.io/en/latest/content/Bioinformatics_Core_Competencies/Volcanoplot.html
+    plt.figure(figsize=(8, 8))
+    plt.scatter(
+        x=lv_res["logFC"],
+        y=lv_res["adj.P.Val"].apply(lambda x: -np.log10(x)),
+        s=1,
+        label="Not significant",
+        color="gray",
+    )
+
+    # highlight down- or up- regulated genes
+    down = lv_res[(lv_res["logFC"] < -0.5) & (lv_res["adj.P.Val"] <= 0.05)]
+    up = lv_res[(lv_res["logFC"] >= 0.5) & (lv_res["adj.P.Val"] <= 0.05)]
+
+    plt.scatter(
+        x=down["logFC"],
+        y=down["adj.P.Val"].apply(lambda x: -np.log10(x)),
+        s=3,
+        label="Down-regulated",
+        color="blue",
+    )
+    plt.scatter(
+        x=up["logFC"],
+        y=up["adj.P.Val"].apply(lambda x: -np.log10(x)),
+        s=3,
+        label="Up-regulated",
+        color="red",
+    )
+
+    plt.xlabel("log2FoldChange")
+    plt.ylabel("-logFDR")
+    plt.axvline(-0.5, color="grey", linestyle="--")
+    plt.axvline(0.5, color="grey", linestyle="--")
+    plt.axhline(1.3, color="grey", linestyle="--")
+    plt.gca().spines["top"].set_visible(False)
+    plt.gca().spines["right"].set_visible(False)
+    plt.legend()
+    plt.title("Volcano Plot of Limma-Voom Results")
+    plt.show()
+
+
+# this creates plots to show the difference in gene expression between clusters
+def gene_expression_diff_graph(labels, clustering, title):
+    gene_cols = [
+        "LOC105378594",
+        "TSNAX",
+        "CALM2",
+        "ERLEC1",
+        "HIGD1A",
+        "IQCJ-SCHIP1",
+        "SST",
+        "DOK7",
+        "SMIM14",
+        "SCOC",
+        "KIAA0408",
+        "MICALL2",
+        "TNRC18",
+        "TAC1",
+        "LOC728433",
+        "LOC100113421",
+        "COL27A1",
+        "LOC100130992",
+        "GAD2",
+        "BCL9L",
+        "SLC6A12",
+        "ATN1",
+        "LOC642969",
+        "ACTR6",
+        "POLE",
+        "KIF26A",
+        "RCN2",
+        "CAPN15",
+        "LOC101927793",
+        "LOC102724632",
+        "LOC105371409",
+        "LOC105372247",
+        "CIC",
+        "BCAM",
+        "FAM65C",
+        "PPEF1",
+        "BEX4",
+    ]
+    symbol_graph = pd.melt(
+        clustering.groupby(labels)[gene_cols].mean().T.reset_index(),
+        id_vars="symbol",
+        value_vars=[0, 1],
+    )
+    diff = clustering.groupby(labels)[gene_cols].mean().T.reset_index()
+    diff["ratio"] = diff[0] / diff[1]
+    plt.figure(figsize=(15, 6))
+
+    ratio_plot = sns.barplot(data=diff, x="symbol", y="ratio", color="dodgerblue")
+    plt.title(title)
+    plt.xticks(rotation="vertical")
+    plt.xlabel("Genes")
+    plt.ylabel("Average TPM Ratio")
+    plt.show()
+
+
+# this shoes difference in samples with or without dementia between clusters
+def dementia_cluster_plot(clusters_df, labels, title):
+    lst = []
+    for i in ["0", "1"]:
+        dementia_percent = (
+            len(
+                clusters_df[
+                    (clusters_df["act_demented"] == "Dementia")
+                    & (clusters_df[labels] == i)
+                ]
+            )
+            / len(clusters_df[(clusters_df[labels] == i)])
+            * 100
+        )
+
+        no_dementia_percent = (
+            len(
+                clusters_df[
+                    (clusters_df["act_demented"] == "No Dementia")
+                    & (clusters_df[labels] == i)
+                ]
+            )
+            / len(clusters_df[(clusters_df[labels] == i)])
+            * 100
+        )
+        lst.append((i, no_dementia_percent, "No Dementia"))
+        lst.append((i, dementia_percent, "Dementia"))
+
+    dementia_percent_df = pd.DataFrame(lst, columns=["Cluster", "Value", "Status"])
+    dementia_percent_df = dementia_percent_df.pivot(
+        index="Cluster", columns="Status", values="Value"
+    )
+    dementia_plot = dementia_percent_df.plot(
+        kind="bar", stacked=True, color=["dodgerblue", "yellowgreen"]
+    )  # https://www.statology.org/seaborn-stacked-bar-plot/
+    plt.ylabel("% of Total")
+    plt.gca().yaxis.set_major_formatter(
+        mtick.PercentFormatter()
+    )  # https://stackoverflow.com/questions/31357611/format-y-axis-as-percent
+    plt.title(title)
+    return dementia_percent_df
+
+
+# this performs enrichment analysis
+def enrichment_analysis(
+    lv_genes_merged,
+):
+    enr = gp.enrichr(
+        gene_list=[str(x) for x in list(list(lv_genes_merged["gene_symbol"]))],
+        gene_sets=[
+            "MSigDB_Hallmark_2020",
+            "KEGG_2021_Human",
+            "GO_Biological_Process_2018",
+            "WikiPathways_2016",
+            "GO_Molecular_Function_2015",
+            "GO_Cellular_Component_2015",
+            "Human_Gene_Atlas",
+            "Disease_Signatures_from_GEO_up_2014",
+            "Disease_Signatures_from_GEO_down_2014",
+        ],
+        organism="human",
+        outdir=None,
+    )
+    # categorical scatterplot
+    ax = dotplot(
+        enr.results,
+        column="Adjusted P-value",
+        x="Gene_set",
+        size=10,
+        top_term=5,
+        figsize=(3, 5),
+        title="Enrichment Analysis",
+        xticklabels_rot=45,
+        show_ring=True,
+        marker="o",
+    )
+    # https://gseapy.readthedocs.io/en/latest/gseapy_example.html
+    return enr
