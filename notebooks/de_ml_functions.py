@@ -9,6 +9,8 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def get_counts():
@@ -183,3 +185,74 @@ def train_models(models, model_names, X_train, y_train, X_val, y_val):
     return model_scores
 
 
+def train_models_boot_data(ml_df,donor_ids, samples, models, model_names, iterations=1000):
+    score_names = ['Accuracy',
+                   'Precision',
+                   'Recall',
+                   'F1',
+                      ]
+    scores_accuracy = []
+    scores_precision = []
+    scores_recall = []
+    scores_f1 = []
+    for i in range(iterations + 1):
+        X_train, y_train, X_test, y_test = custom_train_test_split(ml_df,donor_ids, samples)
+        scores_accuracy_i = []
+        scores_precision_i = []
+        scores_recall_i = []
+        scores_f1_i = []
+        for name, model in zip(model_names, models):
+            model.fit(X_train, y_train)
+            preds = model.predict(X_test)
+
+            scores_accuracy_i.append(accuracy_score(y_test, preds))
+            scores_precision_i.append(precision_score(y_test, preds))
+            scores_recall_i.append(recall_score(y_test, preds))
+            scores_f1_i.append(f1_score(y_test,preds))
+
+        scores_accuracy.append(scores_accuracy_i)
+        scores_precision.append(scores_precision_i)
+        scores_recall.append(scores_recall_i)
+        scores_f1.append(scores_f1_i)
+
+    scores_list = [scores_accuracy, scores_precision, scores_recall, scores_f1]
+    model_scores_dict = {}
+    for name, scores in zip(score_names, scores_list):
+        model_scores_dict[name] = pd.DataFrame(scores, columns= model_names)
+
+    return model_scores_dict
+
+def plot_model_scores(model_scores, ml_df, score_name):
+    sort_order = np.argsort(model_scores.mean().values)
+    descending_sort = sort_order[::-1]
+    sorted_labels = model_scores.iloc[:,descending_sort].columns
+
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(model_scores.iloc[:,descending_sort], orient= 'h',palette='Spectral')
+    y_labels = sorted_labels
+    plt.yticks(range(len(y_labels)), y_labels)
+    # plt.title('Models Trained on Bootstrapped Data')
+    plt.xlabel(f'{score_name} Score')
+    plt.ylabel('Gene Symbol')
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
+    plt.tight_layout()
+
+def subplot_plot_model_scores(model_scores, ml_df, score_name, ax=None):
+    sort_order = np.argsort(model_scores.mean().values)
+    descending_sort = sort_order[::-1]
+    sorted_labels = model_scores.iloc[:, descending_sort].columns
+
+    # Use the provided subplot or create a new one
+    if ax is None:
+        plt.figure(figsize=(10, 6))
+        ax = plt.gca()
+
+    sns.boxplot(model_scores.iloc[:, descending_sort], orient='h', palette='Spectral', ax=ax)
+    y_labels = sorted_labels
+    ax.set_yticks(range(len(y_labels)))
+    ax.set_yticklabels(y_labels)
+    ax.set_xlabel(f'{score_name} Score')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.axvline(0.5,color="gray",linestyle="--")
