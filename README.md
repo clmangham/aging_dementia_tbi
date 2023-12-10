@@ -1,3 +1,4 @@
+
 ## SIADS Capstone Project - Dementia Biomarker Analysis and ML
 
 Project Team: The Neuromancers
@@ -11,7 +12,7 @@ The dataset we will be using for this project was developed by the Allen Institu
 The data used in our analysis comes from a sample within this broader study.  This particular group of participants had either experienced at least one traumatic brain injury with loss of consciousness or were part of the similarity-matched control group.
 
 ### Data Access Statement
-The dataset can be accessed [here](https://aging.brain-map.org/download/index).
+The dataset can be accessed [here](https://aging.brain-map.org/download/index). Some supplementary data is available from the API [here](http://api.brain-map.org).
 ### Work in Progress:
 - Data Processing
 - Exploratory Data Analysis
