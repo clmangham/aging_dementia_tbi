@@ -1,5 +1,10 @@
-FROM jupyter/tensorflow-notebook:latest
+FROM jupyter/r-notebook:latest
 
 USER root
 
-RUN conda install plotly
+# the next section is from chatgpt
+
+COPY requirements_limmavoom_clustering.txt /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
+COPY . /home/jovyan
+

@@ -3,9 +3,7 @@ from rnalysis import filtering
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import ward, dendrogram
-import mpl_axes_aligner
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans, HDBSCAN
 import sklearn.metrics
@@ -14,7 +12,7 @@ from sklearn.decomposition import PCA
 import plotly.express as px
 from matplotlib.pyplot import gcf
 import gseapy as gp
-from gseapy import barplot, dotplot
+from gseapy import dotplot
 import matplotlib.ticker as mtick
 
 
