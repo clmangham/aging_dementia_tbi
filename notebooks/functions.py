@@ -307,7 +307,7 @@ def kmeans_clustering(x):
                 sklearn.metrics.calinski_harabasz_score(x, kmeans.labels_),
                 sklearn.metrics.silhouette_score(x, kmeans.labels_),
             )
-        )
+        )  # code partially from 543
         lst.append((c.inertia_))
     plt.plot([x for x in range(2, 20)], lst)
     plt.xticks([x for x in range(2, 20)])
@@ -335,7 +335,7 @@ def kmedoids_clustering(x):
                 sklearn.metrics.silhouette_score(x, km.labels_),
             )
         )
-        lst.append((c.inertia_))
+        lst.append((c.inertia_))  # code partially from 543
     print("kmedoids evaluation")
     plt.plot([x for x in range(2, 20)], lst)
     plt.xticks([x for x in range(2, 20)])
@@ -374,6 +374,8 @@ def cluster_pca_graphs(n_clusters, labels, pca_res, title):
     plt.xlabel("PC1")
     plt.ylabel("PC2")
     plt.title(title)
+    plt.gca().spines["top"].set_visible(False)
+    plt.gca().spines["right"].set_visible(False)
     plt.show()
 
 
@@ -543,6 +545,8 @@ def gene_expression_diff_graph(labels, clustering, title):
     plt.xticks(rotation="vertical")
     plt.xlabel("Genes")
     plt.ylabel("Average TPM Ratio")
+    plt.gca().spines["top"].set_visible(False)
+    plt.gca().spines["right"].set_visible(False)
     plt.show()
 
 
@@ -586,6 +590,8 @@ def dementia_cluster_plot(clusters_df, labels, title):
         mtick.PercentFormatter()
     )  # https://stackoverflow.com/questions/31357611/format-y-axis-as-percent
     plt.title(title)
+    plt.gca().spines["top"].set_visible(False)
+    plt.gca().spines["right"].set_visible(False)
     return dementia_percent_df
 
 
