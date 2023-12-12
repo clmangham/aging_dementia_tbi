@@ -6,5 +6,18 @@ USER root
 
 COPY requirements_limmavoom_clustering.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
-COPY . /home/jovyan
+# Create a non-root user
+RUN useradd -m -u 2000 youruser
+
+# Set the working directory
+WORKDIR /home/jovyan
+
+# Change the owner of the working directory
+RUN chown -R youruser:youruser /home/jovyan
+
+# Switch to the non-root user
+USER youruser
+
+# Copy files into the container
+COPY --chown=youruser:youruser . /home/jovyan
 

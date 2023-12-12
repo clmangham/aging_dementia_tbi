@@ -18,10 +18,10 @@ import matplotlib.ticker as mtick
 
 # this function loads files and transforms them to output a count matrix and tpm matrix"
 def create_ct_matrix_tpm_matrix(
-    gene_counts="..\\data\\interim\\df_gene_counts.csv",
-    donor_file="..\\data\\raw\\DonorInformation.csv",
-    tbidata_file="..\\data\\raw\\tbi_data_files.csv",
-    genes="..\\data\\raw\\gene_expression_matrix_2016-03-03\\rows-genes.csv",
+    gene_counts="..//data//interim//df_gene_counts.csv",
+    donor_file="..//data//raw//DonorInformation.csv",
+    tbidata_file="..//data//raw//tbi_data_files.csv",
+    genes="..//data//raw//gene_expression_matrix_2016-03-03//rows-genes.csv",
 ):
 
     # read in necessary files
@@ -84,8 +84,8 @@ def create_ct_matrix_tpm_matrix(
         (ct_matrix != 0).any(axis=1)
     ]  # https://stackoverflow.com/questions/22649693/drop-rows-with-all-zeros-in-pandas-data-frame
     tpm_matrix = tpm_matrix[(tpm_matrix != 0).any(axis=1)]
-    ct_matrix.to_csv("..\\data\\interim\\ct_matrix.csv")
-    tpm_matrix.to_csv("..\\data\\interim\\tpm_matrix.csv")
+    ct_matrix.to_csv("..//data//interim//ct_matrix.csv")
+    tpm_matrix.to_csv("..//data//interim//tpm_matrix.csv")
 
     # create experiment design data frame
     exp_design = donor.merge(
@@ -96,7 +96,7 @@ def create_ct_matrix_tpm_matrix(
         list(ct_matrix.columns)
     ]  # https://stackoverflow.com/questions/26202926/sorting-a-pandas-dataframe-by-the-order-of-a-list
     exp_design.rename(columns={"act_demented": "condition"}).to_csv(
-        "..\\data\\interim\\exp_design.csv"
+        "..//data//interim//exp_design.csv"
     )
 
     # return all df
@@ -104,21 +104,21 @@ def create_ct_matrix_tpm_matrix(
 
 
 # this function makes an api call to get other data from the RNA sequencing analysis
-def create_gene_counts_df(tbifile="..\\data\\raw\\tbi_data_files.csv"):
+def create_gene_counts_df(tbifile="..//data//raw//tbi_data_files.csv"):
     tbidata = pd.read_csv(tbifile)
     file_links = tbidata["gene_level_fpkm_file_link"].to_list()
     for link in file_links:
         if link == file_links[0]:
             df_gene_counts = pd.read_csv(
-                "http://api.brain-map.org" + link, delimiter="\\t", engine="python"
+                "http://api.brain-map.org" + link, delimiter="//t", engine="python"
             )
             df_gene_counts["link"] = link
         else:
             file_link = "http://api.brain-map.org" + link
-            new_file = pd.read_csv(file_link, delimiter="\\t", engine="python")
+            new_file = pd.read_csv(file_link, delimiter="//t", engine="python")
             new_file["link"] = link
             df_gene_counts = pd.concat([df_gene_counts, new_file])
-    df_gene_counts.to_csv("..\\data\\interim\\df_gene_counts.csv")
+    df_gene_counts.to_csv("..//data//interim//df_gene_counts.csv")
     return df_gene_counts
 
 
@@ -127,11 +127,11 @@ def lv_diff_exp(
     pval_cutoff,
     lfc_cutoff,
     genes,
-    ct_matrix="..\\data\\interim\\ct_matrix.csv",
-    design_matrix="..\\data\\interim\\exp_design.csv",
+    ct_matrix="..//data//interim//ct_matrix.csv",
+    design_matrix="..//data//interim//exp_design.csv",
     r_path="C:\Program Files\R\R-4.3.2",
-    output_folder="..\\data\\interim",
-    res="..\\data\\interim\\LimmaVoom_condition_Dementia_vs_NoDementia.csv",
+    output_folder="..//data//interim",
+    res="..//data//interim//LimmaVoom_condition_Dementia_vs_NoDementia.csv",
 ):
     ct_matrix_filter = filtering.CountFilter(
         ct_matrix,
@@ -221,8 +221,16 @@ def prep_matrix_for_clustering(
 
 # this performs hierarchical clustering
 def hierarchical_clustering(deg_reads, exp_design):
-    test = deg_reads.T.merge(exp_design, how="left", left_index=True, right_index=True)
-    test = test.rename(columns={"act_demented": "Condition"})
+    deg_reads = deg_reads.drop(columns="index")
+    deg_reads_t = deg_reads.T
+    deg_reads_t.index = deg_reads_t.index.astype(int)
+    test = deg_reads_t.merge(
+        exp_design, how="left", left_index=True, right_on="rnaseq_profile_id"
+    )
+
+    test = test.rename(columns={"condition": "Condition"})
+    test = test.drop(columns="rnaseq_profile_id")
+
     condition = test.pop("Condition")
 
     colors = dict(
@@ -277,6 +285,7 @@ def hierarchical_clustering(deg_reads, exp_design):
 
 # this scales the matrix for future clustering tasks
 def scale_deg_reads(deg_reads):
+    deg_reads = deg_reads.drop(columns="index")
     deg_reads_t = deg_reads.T
     X_arr = deg_reads_t.to_numpy()
     scale_x = StandardScaler()
@@ -410,10 +419,13 @@ def cluster_demo_graphs(
             "nia_reagan",
         ]
     ]
+    deg_reads = deg_reads.drop(columns="index")
     clustering = deg_reads.T
+    clustering.index = clustering.index.astype(int)
     clustering["labels_kmeans"] = [str(x) for x in labels_kmeans]
     clustering["labels_db"] = [str(x) for x in db_labels]
     clustering["labels_kmed"] = [str(x) for x in labels_kmed]
+    label_merge["rnaseq_profile_id"] = label_merge["rnaseq_profile_id"].astype(int)
     clusters_df = clustering.merge(
         label_merge, how="left", left_index=True, right_on="rnaseq_profile_id"
     )
