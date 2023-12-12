@@ -68,8 +68,8 @@ Genes with an adjusted p-value < .05 and an absolute log fold-change > 0.5 were 
 
 
 <p align="center">
-  <img src="figures/pydeseq2.png" style="margin-right: 20px;" width="450" height="500">
-  <img src="figures/liimaDE.png" width="450" height="500">
+  <img src="figures/pydeseq2.png" style="margin-right: 20px;" width="400" height="500">
+  <img src="figures/liimaDE.png" width="400" height="500">
 </p>
 
 ### Dementia Classification Models Using Differentially Expressed Genes
