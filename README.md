@@ -103,14 +103,12 @@ We used the most differentially expressed genes to cluster the gene expression p
 Hierarchical clustering was performed with z-scores calculated for each column on both the samples and genes and visualized in the clustermap below. When the dendrogram is cut to 4 clusters of samples, one group of samples that are mainly in the dementia group form their own branch. The remaining three clusters do seem to primarily contain samples within the same status of dementia, but are branched together. When the dendrogram is cut to 4 clusters of genes, we can see groupings that exhibit similar expression patterns. This allows us to identify groups of samples and gene expression that are interesting. We can see that, for the clusters that primarily contain dementia samples, there is higher normalized TPM of 'LOC101927793', 'LOC105378594',  'LOC105372247', 'LOC102724632', 'LOC105371409', ''POLE', 'SLC6A12', 'BCAM', 'FAM65C', 'COL27A1', 'BCL9L', 'ATN1', 'MICALL2', 'CAPN15', 'TNRC18', 'CIC', 'DOK7', and 'KIF26A' and lower normalized TPM of 'SST', 'TAC1', 'KIAA0408', 'TSNAX', 'SMIM14', 'SCOC', 'RCN2', 'ACTR6', 'CALM2', 'ERLEC1', 'HIGD1A', 'BEX4', 'GAD2', 'PPEF1'. The pattern is not as clear for the remaining genes, so more work will need to be done to identify why that is.
 
 <p align="center">
-  <img src="figures/clustermap.png
-" width="800" height="700">
+  <img src="figures/clustermap.png" width="800" height="700">
 </p>
 
 ### Protein Analysis
 The processed protein dataset contained 279 samples with 28 features representing 14 different proteins (or family of proteins). The same machine learning pipeline used to evaluate models for gene analysis were also used for protein analysis. The top performing models were RandomForestClassifier and GradientBoostingClassifier. Since multiple features could be related to a single protein, multicollinearity of features was analyzed. The resulting groups were consistent with expectations.  The 5 amyloid beta proteins were grouped together, and 5 of the 6 Tau related proteins were grouped together. Additionally, all interleukins were also grouped together with other miscellaneous proteins. A threshold of 1 was selected which resulted in 5 features being selected. These 5 features were then used to fit a RandomForest and GradientBoosting classifier, and permutation feature importance was conducted. The feature of most importance for both models was IHC Tau2. This is consistent with current understanding of dementia where accumulation of Tau proteins in the brain is strongly associated with Alzheimer’s Disease.
 
 <p align="center">
-  <img src="figures/RandomForest_proteins.png
-" width="800" height="600">
+  <img src="figures/RandomForest_proteins.png" width="800" height="600">
 </p>
