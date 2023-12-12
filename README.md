@@ -68,8 +68,8 @@ Genes with an adjusted p-value < .05 and an absolute log fold-change > 0.5 were 
 
 
 <p align="center">
-  <img src="figures/pydeseq2.png" width="500" height="500">
-  <img src="figures/liimaDE.png" width="500" height="500">
+  <img src="figures/pydeseq2.png" style="margin-right: 20px;" width="450" height="500">
+  <img src="figures/liimaDE.png" width="450" height="500">
 </p>
 
 ### Dementia Classification Models Using Differentially Expressed Genes
@@ -93,10 +93,8 @@ The analyses identified KIAA0408 and LOC728433 as impactful genes, while LOC1001
 We used the most differentially expressed genes to cluster the gene expression profiles of each sample. We compared clustering using K-medoids, HDBSCAN, and K-means, and found that the clusters defined by K-medoids, visualized on the PCA scatterplot  to the right, had the best silhouette score and Davies-Bouldin score.  We also evaluated the clusters’ demographic components and found that cluster 0 had primarily samples with dementia, and cluster 1 had primarily samples that had not had dementia, visualized on the bar graph to the right. More work needs to be done to determine why the samples in unexpected clusters have been placed there.
 
 <p align="center">
-  <img src="figures/kmedoids_clusterig.png" width="500" height="500">
-</p>
-<p align="center">
-  <img src="figures/kmedoids_bar.png" width="500" height="500">
+  <img src="figures/kmedoids_clusterig.png" style="margin-right: 20px;" width="400" height="500">
+  <img src="figures/kmedoids_bar.png" width="400" height="500">
 </p>
 
 
