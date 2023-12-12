@@ -94,7 +94,7 @@ We used the most differentially expressed genes to cluster the gene expression p
 
 <p align="center">
   <img src="figures/kmedoids_clusterig.png" width="500" height="500">
-    </p>
+</p>
   <img src="figures/kmedoids_bar.png" width="500" height="500">
 </p>
 
