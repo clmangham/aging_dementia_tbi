@@ -3,7 +3,6 @@ services:
   capstone:
     build:
       context: .
-      args:
       dockerfile: DockerFile
     environment:
       - JUPYTER_TOKEN=hi
