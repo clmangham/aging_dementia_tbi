@@ -2,9 +2,8 @@ FROM jupyter/r-notebook:latest
 
 USER root
 
-# the next section is from chatgpt
+# the rest of this is from chatgpt
 RUN useradd -m -u 2000 youruser
-
 # R installations partial
 RUN R -e "install.packages('BiocManager',dependencies=TRUE, repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('abind',dependencies=TRUE, repos='http://cran.rstudio.com/')"
@@ -18,46 +17,27 @@ RUN R -e "install.packages('BiocVersion',dependencies=TRUE, repos='http://cran.r
 RUN R -e "install.packages('bit',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('bit64',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('bitops',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-
 RUN R -e "install.packages('blob',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-
 RUN R -e "install.packages('boot',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('cachem',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-
 RUN R -e "install.packages('class',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('cli',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('cluster',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('codetools',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('colorspace',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-
-
 RUN R -e "install.packages('compiler',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-
 RUN R -e "install.packages('cpp11',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
 RUN R -e "install.packages('crayon',dependencies=TRUE, repos='http://cran.rstudio.com/')" 
-
-
-
-
-
-
-
-
-
 #install python packages
 COPY requirements_limmavoom_clustering.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
-
 # Set the working directory
 WORKDIR /home/jovyan
-
 # Change the owner of the working directory and r directory so RNAlysis can install packages
 RUN chown -R youruser:youruser /home/jovyan
 RUN chown -R youruser:youruser /opt/conda/lib/R
 # Switch to the non-root user
 USER youruser
-
-
 # Copy files into the container
 COPY --chown=youruser:youruser . /home/jovyan
 
