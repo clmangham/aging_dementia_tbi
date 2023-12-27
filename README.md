@@ -110,3 +110,10 @@ The processed protein dataset contained 279 samples with 28 features representin
 <p align="center">
   <img src="figures/RandomForest_proteins.png" width="700" height="500">
 </p>
+
+### References
+1.	(2016). (tech.). TECHNICAL WHITE PAPER: QUANTITATIVE DATA GENERATION. Retrieved December 10, 2023, from https://help.brain-map.org/display/aging/Documentation. 
+2.	(2017). (tech.). TECHNICAL WHITE PAPER: OVERVIEW. Retrieved December 10, 2023, from https://help.brain-map.org/display/aging/Documentation. 
+3.	Aging, dementia and Traumatic Brain Injury Study. Overview :: Allen Brain Atlas: Aging, Dementia and TBI Study. (n.d.). https://aging.brain-map.org/overview/home 
+4.	Mayeux R, Stern Y. Epidemiology of Alzheimer disease. Cold Spring Harb Perspect Med. 2012 Aug 1;2(8):a006239. doi: 10.1101/cshperspect.a006239. PMID: 22908189; PMCID: PMC3405821.
+5.	World Health Organization. (2023, March 15). Dementia. World Health Organization. https://www.who.int/news-room/fact-sheets/detail/dementia 
