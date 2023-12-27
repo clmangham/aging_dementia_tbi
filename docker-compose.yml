@@ -3,9 +3,6 @@ services:
   capstone:
     build:
       context: .
-      args:
-        NB_USER: $NB_USER
-        NB_UID: $NB_UID
       dockerfile: DockerFile
     environment:
       - JUPYTER_TOKEN=hi
